@@ -1,0 +1,9 @@
+bikemiles.get:
+  path: '/bike/bikemiles' 
+  defaults:
+    _title: 'Bike Miles'
+    _controller: '\Drupal\bikemiles\Controller\BikeMilesController:tally'
+  requirements:
+    _permission: 'access content'
+  options:
+    no_cache: 'TRUE'

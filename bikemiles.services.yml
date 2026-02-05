@@ -1,0 +1,10 @@
+services:
+  logger.channel.bikemiles:
+    parent: logger.channel_base
+    arguments: ['bikemiles']
+
+
+  bikemiles:bikemiles:
+    class: Drupal\bikemiles\BikeMiles
+    arguments: ['@entity_type.manager', '@logger.channel.bikemiles']
+
