@@ -16,6 +16,62 @@ class BikeMiles{
 	 ) {}
 	
 	
+	/**
+	 * Update a bike with miles from a new ride
+	 *
+	 */	
+	public function updateBikeMiles($entity): void {
+		$newMilesValue = $entity->get('field_miles')->value;
+		if (empty($newMilesValue)) {
+			$this->logger->error("Bail: Node @id has no mileage value.", ['@id' => $entity->id()]);
+			return;
+		}		
+		$newMiles = (int) $newMilesValue;
+		
+		$original_entity = $entity->original ?? NULL;
+		if ($original_entity) {
+			$oldMilesValue = $original_entity->get('field_miles')->value;		
+			if (empty($oldMilesValue)) {
+				$this->logger->critical("Bail: Original version of Node @id missing mileage.", ['@id' => $entity->id()]);
+				return;
+			}
+		
+			$oldMiles = (int) $oldMilesValue;
+			$delta = $newMiles - $oldMiles;
+		} 
+		else {
+			$delta = $newMiles;
+		}
+
+		if ($delta === 0) {
+			return;
+		}
+		
+		$bikeTarget = $entity->get('field_bike')->target_id;
+		if (!$bikeTarget) {
+			return; // No bike associated with this ride.
+		}
+
+		$storage  = $this->entityTypeManager->getStorage('node');
+		$bikeNode = $storage->load($bikeTarget);
+		$currentMileage = (int) $bikeNode->get('field_mileage')->value;
+		$bikeNode->set('field_mileage', $currentMileage + $delta);
+		
+		// Use setSyncing() to tell other hooks/ECA 
+		// that this is an automated update and to stay quiet.
+		$bikeNode->setSyncing(TRUE);
+		$bikeNode->save();
+			
+		$this->logger->notice('Bicycle @bike (@nid) updated. Delta: @delta. Total: @total', [
+			'@bike'  => $bikeNode->label(),
+			'@nid'   => $bikeNode->id(),
+			'@delta' => $delta,
+			'@total' => $currentMileage + $delta,
+		]);
+ 
+	}
+	
+	
 	public function setMiles() {
 		$this->logger->notice("Starting setMiles");
 		$this->getRides();

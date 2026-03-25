@@ -14,14 +14,11 @@ class BikeMilesController extends ControllerBase {
 
 	public static function create(ContainerInterface $container): static {
 		return new static(
-		  $container->get('bikemiles:bikemiles'),
+		  $container->get('bikemiles.bikemiles'),
 		);
 	}
 
 	public function tally(){
-
-	//	$this->bikeMiles->getRides();
-	//	$this->bikeMiles->setBikes();
 		$bikes = $this->bikeMiles->getBikes();
 		foreach ($bikes as $bike => $miles){
 			$rows[] = [$bike, $miles];

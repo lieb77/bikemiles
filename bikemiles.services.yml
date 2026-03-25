@@ -4,7 +4,7 @@ services:
     arguments: ['bikemiles']
 
 
-  bikemiles:bikemiles:
+  bikemiles.bikemiles:
     class: Drupal\bikemiles\BikeMiles
     arguments: ['@entity_type.manager', '@logger.channel.bikemiles']
 
